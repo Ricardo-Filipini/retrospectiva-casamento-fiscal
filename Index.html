@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retrospectiva 2025 - Casamento Fiscal</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+        .font-marker {
+            font-family: 'Permanent Marker', cursive;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .whatsapp-bubble {
+            background-color: #005c4b;
+            color: white;
+            border-radius: 8px 0px 8px 8px;
+            padding: 10px;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .whatsapp-bubble::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -10px;
+            width: 0;
+            height: 0;
+            border: 10px solid transparent;
+            border-top-color: #005c4b;
+            border-right: 0;
+            border-bottom: 0;
+            margin-top: 0px;
+            margin-right: 0;
+        }
+        .animate-crawl {
+            animation: crawl-backwards 3s infinite linear;
+        }
+        @keyframes crawl-backwards {
+            0% { transform: translateX(0) scaleX(-1); }
+            50% { transform: translateX(-20px) scaleX(-1); }
+            100% { transform: translateX(0) scaleX(-1); }
+        }
+        .rotate-upside-down {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        const { 
+            Trophy, AlertTriangle, PartyPopper, Heart, DollarSign, 
+            MapPin, MessageCircle, Skull, Syringe, ArrowDown, Users,
+            Plane, Construction, Baby, Mic, Utensils
+        } = lucide;
+
+        // --- COMPONENTS ---
+
+        // 1. Hero Section
+        const Hero = ({ onStart }) => (
+            <div className="min-h-screen flex flex-col items-center justify-center text-center p-6 bg-gradient-to-b from-slate-900 to-slate-800 relative overflow-hidden">
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                
+                <h1 className="text-5xl md:text-7xl font-marker text-yellow-400 mb-4 animate-bounce">
+                    CASAMENTO FISCAL
+                </h1>
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">
+                    Crônicas do Caos: Retrospectiva 2025
+                </h2>
+                <p className="max-w-2xl text-slate-400 mb-10 text-lg">
+                    Do prédio da SEFAZ caindo aos pedaços ao 4º lugar no Beach Tennis. 
+                    Uma análise sociológica da elite do funcionalismo público e sua 
+                    luta por preenchimento labial e bolões de R$ 14,00.
+                </p>
+                <button 
+                    onClick={onStart}
+                    className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full text-xl transition-all transform hover:scale-105 shadow-lg flex items-center gap-2"
+                >
+                    Iniciar Zueira <PartyPopper />
+                </button>
+            </div>
+        );
+
+        // 2. Character Card Component
+        const CharacterCard = ({ char }) => (
+            <div className="glass-panel p-6 rounded-xl transform hover:-translate-y-2 transition-all duration-300 relative group">
+                <div className="absolute -top-4 -right-4 bg-yellow-500 text-black font-bold px-3 py-1 rounded-full text-sm shadow-md">
+                    {char.archetype}
+                </div>
+                <div className="text-4xl mb-4">{char.icon}</div>
+                <h3 className="text-2xl font-bold text-white mb-2">{char.name}</h3>
+                <p className="text-slate-300 text-sm mb-4 italic">"{char.quote}"</p>
+                <div className="border-t border-slate-600 pt-4">
+                    <h4 className="text-xs uppercase tracking-wider text-slate-500 font-bold mb-2">Momentos Chave</h4>
+                    <p className="text-sm text-slate-200">{char.desc}</p>
+                </div>
+            </div>
+        );
+
+        // 3. Interactive Widgets
+        const ReginaldoSimulator = () => {
+            const [msg, setMsg] = useState("Clique para invocar Reginaldo");
+            const messages = [
+                "Cotação do Dólar: R$ 5,89 (Fonte: Vozes da minha cabeça)",
+                "Vocês já leram Dostoiévski hoje?",
+                "Kkkkkkkkk",
+                "Alguém viu minha chave?",
+                "Nada com nada.",
+                "[Link suspeito do YouTube]",
+                "Bom dia grupo (às 15:00)"
+            ];
+            
+            const generate = () => {
+                const random = messages[Math.floor(Math.random() * messages.length)];
+                setMsg(random);
+            };
+
+            return (
+                <div className="bg-slate-800 p-4 rounded-lg border border-slate-600 my-4 text-center">
+                    <h4 className="font-bold text-blue-400 mb-2">📟 Simulador de Reginaldo</h4>
+                    <div className="bg-slate-900 p-3 rounded mb-3 font-mono text-green-400 min-h-[60px] flex items-center justify-center">
+                        "{msg}"
+                    </div>
+                    <div className="text-xs text-slate-500 mb-2 italic">Julia está se divertindo com isso...</div>
+                    <button onClick={generate} className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm text-white">
+                        Gerar Mensagem Aleatória
+                    </button>
+                </div>
+            );
+        };
+
+        const SefazSurvival = () => {
+            const [status, setStatus] = useState("alive"); // alive, dead, escaped
+
+            return (
+                <div className="bg-red-900/30 p-4 rounded-lg border border-red-500/50 my-4">
+                    <h4 className="font-bold text-red-400 mb-2 flex items-center gap-2">
+                        <Construction size={16}/> Alerta Estrutural SEFAZ
+                    </h4>
+                    <p className="text-sm mb-4">Juliano gritou: "Vão esperar alguém morrer?" O que você faz?</p>
+                    
+                    {status === "alive" && (
+                        <div className="flex gap-2 justify-center">
+                            <button onClick={() => setStatus("dead")} className="bg-red-600 px-3 py-1 rounded text-sm">Esperar o Laudo</button>
+                            <button onClick={() => setStatus("escaped")} className="bg-green-600 px-3 py-1 rounded text-sm">Pular na Laje (Tiago Style)</button>
+                        </div>
+                    )}
+                    
+                    {status === "dead" && (
+                        <div className="text-center mt-2 animate-pulse text-red-300">
+                            💀 Você confiou na burocracia. O teto caiu. Fim.
+                        </div>
+                    )}
+                    
+                    {status === "escaped" && (
+                        <div className="text-center mt-2 text-green-300">
+                            🏃‍♂️ Você pulou pro 3º andar! Sobreviveu para reclamar do ar-condicionado amanhã.
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const GuiPinhoBirthday = () => {
+            const [copied, setCopied] = useState(false);
+            const [upsideDown, setUpsideDown] = useState(false);
+
+            return (
+                <div className="bg-slate-700 p-4 rounded-lg my-4">
+                    <h4 className="font-bold text-purple-400 mb-2">🎂 Aniversário do Gui Pinho</h4>
+                    <p className="text-xs mb-2">Esqueceram o aniversário. Michaela lembrou tarde. O que você faz?</p>
+                    
+                    {!copied ? (
+                        <div className="flex gap-2 justify-center">
+                            <button onClick={() => setCopied(true)} className="bg-purple-600 px-3 py-1 rounded text-sm">Copiar msg da Michaela</button>
+                            <button onClick={() => {setCopied(true); setUpsideDown(true)}} className="bg-yellow-600 px-3 py-1 rounded text-sm">Mandar de Cabeça pra Baixo (Ricardo)</button>
+                        </div>
+                    ) : (
+                        <div className={`bg-white text-black p-2 rounded mt-2 text-center text-sm ${upsideDown ? 'rotate-180' : ''}`}>
+                            "Parabeeeens atrasado... (Taisa é mais gente boa que vc)"
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const DinnerCalculator = () => {
+            const [revolt, setRevolt] = useState(50);
+            
+            return (
+                <div className="bg-green-900/30 p-4 rounded-lg border border-green-500/50 my-4">
+                    <h4 className="font-bold text-green-400 mb-2 flex items-center gap-2">
+                        <Utensils size={16}/> Natal na Daviline
+                    </h4>
+                    <p className="text-xs mb-3">Preço sugerido do jantar: R$ {98 + (revolt/2)}</p>
+                    <input 
+                        type="range" 
+                        min="0" 
+                        max="100" 
+                        value={revolt} 
+                        onChange={(e) => setRevolt(e.target.value)}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <div className="mt-2 text-center font-bold text-yellow-300">
+                        Nível de Revolta: {revolt > 80 ? "COMUNISTA (Juliano)" : revolt > 50 ? "MÃO DE VACA (Tobias)" : "ELITE (Daviline)"}
+                    </div>
+                    <div className="text-xs text-center mt-1 italic">
+                        {revolt > 80 ? '"Preço de casamento isso!"' : revolt > 50 ? '"Menos que isso é difícil..."' : '"Vou levar Hilux e Fivela"'}
+                    </div>
+                </div>
+            );
+        };
+
+        // 4. Timeline Section
+        const Timeline = () => {
+            const events = [
+                {
+                    month: "JANEIRO",
+                    title: "O Enigma & O Colapso",
+                    content: "O ano começa com Reginaldo falando nada com nada e o prédio da SEFAZ ameaçando ruir. A elite fiscal trabalha sob risco de morte.",
+                    widget: <><ReginaldoSimulator /><SefazSurvival /></>
+                },
+                {
+                    month: "FEVEREIRO",
+                    title: "Carnaval & Unhas",
+                    content: "Dilema: Bloco Raparigueiros (Facada) ou Segurança? Tiago quebra a unha no futevôlei e enterra o sonho do Ironman.",
+                    icon: <Skull className="text-red-500" />
+                },
+                {
+                    month: "MARÇO",
+                    title: "Crise do Botox",
+                    content: "Assefaz suspensa. Pânico geral. Ninguém liga pro coração, a prioridade é a Dra. Virgínia e o preenchimento labial.",
+                    icon: <Syringe className="text-pink-500" />
+                },
+                {
+                    month: "ABRIL",
+                    title: "O Pódio de Schrödinger",
+                    content: "Tiago e Julia ganham troféu de 4º lugar (entre 3 duplas?). Gustavo questiona a existência: 'Pq ganha troféu?'. Drielle audita: 'Muito amargo'.",
+                    customVisual: (
+                        <div className="flex items-center justify-center p-4 bg-yellow-900/20 rounded-lg border border-yellow-600 border-dashed">
+                            <Trophy className="text-yellow-600 mr-2" size={40} />
+                            <div className="text-center">
+                                <h3 className="text-xl font-bold text-yellow-500">4º LUGAR</h3>
+                                <p className="text-xs text-yellow-700">Mérito duvidoso</p>
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    month: "MAIO",
+                    title: "A Marcha à Ré de Levi",
+                    content: "Filho de Ricardo aprende a engatinhar... para trás. Ricardo exige vacinas antes de visitas. O grupo derrete em emojis.",
+                    customVisual: (
+                        <div className="flex justify-center my-4">
+                            <Baby className="animate-crawl text-blue-300" size={48} />
+                        </div>
+                    )
+                },
+                {
+                    month: "JUNHO/JULHO",
+                    title: "Esquecimento & Exílio",
+                    content: "Aniversário de Gui Pinho esquecido (Ctrl+C Ctrl+V). Daviline exilada em Formosa (Fanfic: Prefeita Corrupta de Hilux).",
+                    widget: <GuiPinhoBirthday />
+                },
+                {
+                    month: "AGOSTO",
+                    title: "Luta de Classes",
+                    content: "Rafa faz festa na comunidade ('Raiz', maconha e confusão). O resto vai pro Oscarito ('Nutella'). Gustavo sentencia: 'Comunidade Nutella'.",
+                    icon: <Users className="text-orange-500" />
+                },
+                {
+                    month: "DEZEMBRO",
+                    title: "Miséria de Luxo",
+                    content: "Nota Legal: Luiza ganha R$ 100, o resto chora. Jantar de R$ 98 causa revolta proletária. Bolão da Mega: R$ 14,00 por cabeça.",
+                    widget: <DinnerCalculator />
+                }
+            ];
+
+            return (
+                <div className="max-w-3xl mx-auto px-4 py-10 relative">
+                    <div className="absolute left-4 md:left-1/2 h-full w-1 bg-slate-700 transform -translate-x-1/2"></div>
+                    
+                    {events.map((event, idx) => (
+                        <div key={idx} className={`relative mb-12 flex flex-col md:flex-row ${idx % 2 === 0 ? 'md:flex-row-reverse' : ''} items-center w-full`}>
+                            {/* Dot on timeline */}
+                            <div className="absolute left-4 md:left-1/2 w-4 h-4 bg-yellow-400 rounded-full transform -translate-x-1/2 border-4 border-slate-900 z-10"></div>
+                            
+                            {/* Content Bubble */}
+                            <div className="w-full md:w-5/12 ml-12 md:ml-0 glass-panel p-5 rounded-lg border-l-4 border-l-yellow-500">
+                                <span className="text-xs font-bold text-yellow-400 tracking-widest">{event.month}</span>
+                                <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                                    {event.icon} {event.title}
+                                </h3>
+                                <p className="text-slate-300 text-sm leading-relaxed mb-3">
+                                    {event.content}
+                                </p>
+                                {event.customVisual}
+                                {event.widget}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            );
+        };
+
+        // 5. Roster Section
+        const Roster = () => {
+            const characters = [
+                { name: "Tiago", archetype: "O Líder Frágil", icon: "💅", quote: "Se der merda... tamo no terceiro andar... da até pra pular", desc: "Quebrou unha no futevôlei. 4º lugar no Beach Tennis. Sofre bullying da esposa." },
+                { name: "Rafa", archetype: "Agitador Raiz", icon: "🍺", quote: "Para de jogar água no meu chopp", desc: "Organiza eventos caóticos. Alerta sobre facadas. Odeia Jorginho." },
+                { name: "Juliano", archetype: "Rebelde Marxista", icon: "☭", quote: "Vão esperar alguém morrer?", desc: "Furioso com a SEFAZ. Cético com preços de Natal. Prioriza Botox." },
+                { name: "Daviline", archetype: "Matriarca Exilada", icon: "🤠", quote: "Preço de casamento isso", desc: "Exilada em Formosa. Agroboy de Hilux. Tenta cobrar R$ 98 no jantar." },
+                { name: "Tobias", archetype: "Agente do Caos", icon: "🌪️", quote: "Menos que isso difícil", desc: "Sugere blocos perigosos. Maior perigo é ele para ele mesmo." },
+                { name: "Ricardo", archetype: "Pai Porteiro", icon: "👶", quote: "Espera eu tomar as vacinas tia", desc: "Usa Levi como escudo. Manda msg de cabeça pra baixo. Quer Kwids." },
+                { name: "Gui Pinho", archetype: "Gerente Esquecido", icon: "📉", quote: "Errada eh vc que ainda lê", desc: "Aniversário esquecido. Pragmático. Zoa o Reginaldo." },
+                { name: "Drielle", archetype: "Auditora da Verdade", icon: "👄", quote: "4º gente... Muito amargo", desc: "Turista estética. Obcecada por preenchimento. Expõe fracassos alheios." },
+                { name: "Reginaldo", archetype: "O Enigma", icon: "👽", quote: "Nada com nada kkkk", desc: "Cota dólar aleatoriamente. Entretenimento da Julia." },
+                { name: "Julia", archetype: "Observadora", icon: "👀", quote: "Só no suco 🤣🤣", desc: "Parceira de pódio duvidoso. Ri do Reginaldo." },
+            ];
+
+            return (
+                <div className="max-w-6xl mx-auto px-4 py-12">
+                    <h2 className="text-4xl font-marker text-center text-white mb-10">O Elenco do Caos <span className="text-sm font-sans block text-slate-400 mt-2">Arquétipos de 2025</span></h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {characters.map((char, idx) => (
+                            <CharacterCard key={idx} char={char} />
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // 6. Conclusion
+        const Conclusion = () => (
+            <div className="bg-slate-900 py-16 px-6 text-center mt-12 border-t border-slate-800">
+                <div className="max-w-3xl mx-auto">
+                    <h2 className="text-3xl font-bold text-white mb-6">Conclusão Sociológica</h2>
+                    <p className="text-lg text-slate-300 mb-8 italic">
+                        "Vínculo Traumático via Zueira"
+                    </p>
+                    <div className="bg-slate-800 p-6 rounded-xl text-left space-y-4">
+                        <p>🏆 <strong>Precariedade de Luxo:</strong> Sala VIP de aeroporto vs. Prédio caindo aos pedaços.</p>
+                        <p>💸 <strong>Ansiedade Econômica:</strong> Salário de Auditor vs. Briga por R$ 14,00 no bolão.</p>
+                        <p>🎾 <strong>Cultura da Resenha:</strong> O objetivo não é vencer o Beach Tennis, é transformar o 4º lugar em meme.</p>
+                    </div>
+                    <p className="mt-10 text-slate-500 text-sm">
+                        Desenvolvido para o Grupo Casamento Fiscal. <br/>
+                        Sobrevivemos a 2025. Que venham os Kwids de Ricardo em 2026.
+                    </p>
+                </div>
+            </div>
+        );
+
+        // Main App Component
+        const App = () => {
+            const [view, setView] = useState('hero'); // hero, app
+
+            if (view === 'hero') {
+                return <Hero onStart={() => setView('app')} />;
+            }
+
+            return (
+                <div className="min-h-screen">
+                    {/* Navigation */}
+                    <nav className="sticky top-0 z-50 bg-slate-900/90 backdrop-blur border-b border-slate-700 px-6 py-4 flex justify-between items-center">
+                        <div className="font-marker text-yellow-400 text-xl">CF 2025</div>
+                        <div className="text-xs text-slate-400 hidden md:block">Bunker dos Auditores</div>
+                    </nav>
+
+                    {/* Content */}
+                    <Timeline />
+                    
+                    {/* Intermission: Escape Jorginho Game */}
+                    <div className="bg-purple-900 py-10 text-center">
+                        <h3 className="text-2xl font-bold text-white mb-2">🚨 ALERTA: JORGINHO APROXIMANDO 🚨</h3>
+                        <p className="text-purple-200 mb-4">"Ele pegou eu e a Julia no Halloween... 1 hora falando..."</p>
+                        <button 
+                            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded animate-pulse"
+                            onClick={() => alert("Rafa puxou seu braço! Você foi salvo.")}
+                        >
+                            SINAL DE RESGATE DO RAFA
+                        </button>
+                    </div>
+
+                    <Roster />
+
+                    <Conclusion />
+                    
+                    {/* Floating Music Button (Simulated) */}
+                    <div className="fixed bottom-6 right-6 z-50">
+                        <button className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110" onClick={() => alert("Tocando áudio: 'Normal' - Daviline")}>
+                           <Mic size={24} />
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
