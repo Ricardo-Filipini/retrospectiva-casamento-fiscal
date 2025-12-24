@@ -4,69 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Retrospectiva 2025 - Casamento Fiscal</title>
-    
-    <!-- React & ReactDOM -->
+    <!-- React & ReactDOM (v18) -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
-    <!-- Babel -->
+    <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
-
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Roboto+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap');
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0f172a;
-            color: #e2e8f0;
+            background-color: #111827; /* gray-900 */
+            color: #f3f4f6; /* gray-100 */
+            overflow-x: hidden;
         }
-        .font-marker {
-            font-family: 'Permanent Marker', cursive;
-        }
+        .font-marker { font-family: 'Permanent Marker', cursive; }
+        .font-mono { font-family: 'Roboto Mono', monospace; }
+        
         .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(31, 41, 55, 0.7); /* gray-800 with opacity */
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(75, 85, 99, 0.3); /* gray-600 with opacity */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        .whatsapp-bubble {
-            background-color: #005c4b;
-            color: white;
-            border-radius: 8px 0px 8px 8px;
-            padding: 10px;
+        
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, #3b82f6, #8b5cf6, #ec4899); /* blue-500 to purple-500 to pink-500 */
+            transform: translateX(-50%);
+        }
+        
+        @media (max-width: 768px) {
+            .timeline-line { left: 2rem; }
+        }
+
+        /* Animations */
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .whatsapp-message {
             position: relative;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            background: #005c4b;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border-top-left-radius: 0;
+            margin-left: 1rem;
+            max-width: 80%;
+            font-family: Helvetica, Arial, sans-serif;
         }
-        .whatsapp-bubble::after {
+        .whatsapp-message::before {
             content: '';
             position: absolute;
             top: 0;
-            right: -10px;
+            left: -10px;
             width: 0;
             height: 0;
             border: 10px solid transparent;
             border-top-color: #005c4b;
-            border-right: 0;
+            border-left: 0;
             border-bottom: 0;
-            margin-top: 0px;
-            margin-right: 0;
-        }
-        .animate-crawl {
-            animation: crawl-backwards 3s infinite linear;
-        }
-        @keyframes crawl-backwards {
-            0% { transform: translateX(0) scaleX(-1); }
-            50% { transform: translateX(-20px) scaleX(-1); }
-            100% { transform: translateX(0) scaleX(-1); }
-        }
-        .rotate-upside-down {
-            transform: rotate(180deg);
         }
     </style>
 </head>
@@ -74,82 +83,106 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+        const { useState, useEffect } = React;
         const { 
-            Trophy, AlertTriangle, PartyPopper, Heart, DollarSign, 
-            MapPin, MessageCircle, Skull, Syringe, ArrowDown, Users,
-            Plane, Construction, Baby, Mic, Utensils
+            PartyPopper, Skull, Syringe, Trophy, Baby, MapPin, 
+            Users, DollarSign, AlertTriangle, MessageCircle, 
+            HardHat, HeartHandshake, Plane, UtensilsCrossed,
+            Banknote, Siren
         } = lucide;
 
-        // --- COMPONENTS ---
+        // --- DATA ---
+        const characters = [
+            { name: "Tiago", archetype: "O Líder Frágil", icon: "💅", quote: "Se der merda... tamo no terceiro andar... da até pra pular ali naquela laje", desc: "Quebrou a unha no futevôlei. 4º lugar no Beach Tennis (com troféu). Sofre bullying da esposa com as mensagens do Reginaldo." },
+            { name: "Rafa", archetype: "Agitador \"Raiz\"", icon: "🍺", quote: "Para de jogar água no meu chopp", desc: "Alerta sobre facadas no Carnaval (com fontes do Metrópoles). Curte festa na comunidade (\"raiz\"). Odeia Jorginho." },
+            { name: "Juliano", archetype: "O Rebelde Marxista", icon: "😡", quote: "Vão esperar alguém morrer?", desc: "Furioso com o prédio da SEFAZ. Cético com preços de Natal (R$ 98 é \"preço de casamento\"). Prioriza a Dra. Virgínia." },
+            { name: "Daviline", archetype: "A Matriarca Exilada", icon: "🤠", quote: "Normal", desc: "Exilada em Formosa (após boatos de Guarapari). Persona de \"agroboy de Hilux\". Tentou o menu de R$ 98 no Natal." },
+            { name: "Tobias", archetype: "O Agente do Caos", icon: "🌪️", quote: "Menos que isso difícil", desc: "Maior perigo do bloco é ele mesmo. Acha R$ 98 pouco para um jantar." },
+            { name: "Ricardo", archetype: "O Pai Porteiro", icon: "👶", quote: "Espera eu tomar as vacinas tia", desc: "Usa o filho Levi (que engatinha de ré) como escudo social. Manda parabéns de cabeça para baixo. Quer 350 Kwids." },
+            { name: "Gui Pinho", archetype: "O Gerente Esquecido", icon: "📅", quote: "Errada eh vc que ainda lê", desc: "Teve o aniversário esquecido e recebeu parabéns copiado e colado. Pragmático, critica quem lê Reginaldo." },
+            { name: "Drielle", archetype: "A Turista Estética", icon: "💉", quote: "4o gente... Muito amargo", desc: "Auditora da verdade (20 duplas!). Obcecada por preenchimento na Nova Pelle. Reclamou de não ganhar no Nota Legal." },
+            { name: "Julia", archetype: "A Observadora Paciente", icon: "👀", quote: "Só no suco 🤣🤣🤣", desc: "Parceira de pódio duvidoso de Tiago. Diverte-se com o absurdo das mensagens do Reginaldo à noite." },
+            { name: "Reginaldo", archetype: "O Enigma", icon: "👽", quote: "...", desc: "Fala nada com nada. Cota dólar aleatoriamente. Entretenimento puro para Julia e pesadelo para Tiago." },
+            { name: "Luiza Choairy", archetype: "A Otimista Passiva", icon: "🤞", quote: "O próximo vai ser ouro", desc: "Única a ganhar no Nota Legal (R$ 100). Tenta ver o lado bom (ou zoar) o 4º lugar." },
+            { name: "Pedro", archetype: "O Atrasado do Bolão", icon: "⏰", quote: "...", desc: "Quase ficou de fora da Mega da Virada. Rafa ameaçou: \"Pedro rodou\"." },
+            { name: "Indinho", archetype: "O Copiador", icon: "📝", quote: "...", desc: "Entrou na onda do copia-e-cola no aniversário do Gui Pinho." },
+            { name: "Gustavo", archetype: "O Bon Vivant Niilista", icon: "🍷", quote: "E pq ganha troféu?", desc: "Questionador de pódios. Defensor do Oscarito (\"Comunidade Nutella\"). Quer \"viver loucamente\" no Carnaval." }
+        ];
 
-        // 1. Hero Section
-        const Hero = ({ onStart }) => (
-            <div className="min-h-screen flex flex-col items-center justify-center text-center p-6 bg-gradient-to-b from-slate-900 to-slate-800 relative overflow-hidden">
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-                
-                <h1 className="text-5xl md:text-7xl font-marker text-yellow-400 mb-4 animate-bounce">
-                    CASAMENTO FISCAL
-                </h1>
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">
-                    Crônicas do Caos: Retrospectiva 2025
-                </h2>
-                <p className="max-w-2xl text-slate-400 mb-10 text-lg">
-                    Do prédio da SEFAZ caindo aos pedaços ao 4º lugar no Beach Tennis. 
-                    Uma análise sociológica da elite do funcionalismo público e sua 
-                    luta por preenchimento labial e bolões de R$ 14,00.
-                </p>
-                <button 
-                    onClick={onStart}
-                    className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full text-xl transition-all transform hover:scale-105 shadow-lg flex items-center gap-2"
-                >
-                    Iniciar Zueira <PartyPopper />
-                </button>
-            </div>
-        );
+        const events = [
+            {
+                month: "JANEIRO",
+                title: "O Enigma de Reginaldo & O Colapso da SEFAZ",
+                icon: <HardHat size={24} className="text-yellow-500" />,
+                description: "O ano começa com Drielle questionando o que Reginaldo fala (\"nada com nada\"). Enquanto isso, no 10º andar da SEFAZ, Juliano grita: \"Vão esperar alguém morrer?\". Tiago sugere pular na laje do 3º andar como plano de fuga. Gustavo chama as medidas de segurança de \"paliativas e absurdas\".",
+                widgets: ['reginaldo', 'sefaz']
+            },
+            {
+                month: "FEVEREIRO",
+                title: "Carnaval: Facadas vs. Unha Encravada",
+                icon: <Skull size={24} className="text-red-500" />,
+                description: "Rafa alerta sobre o bloco \"Raparigueiros\" com notícias do Metrópoles: \"Todo ano dá facada\". Gustavo quer \"viver loucamente\". Tiago define Tobias como o maior perigo para si mesmo. O sonho do Ironman morre quando Tiago quebra a unha no futevôlei."
+            },
+            {
+                month: "MARÇO",
+                title: "Pânico Estético: Assefaz Suspensa!",
+                icon: <Syringe size={24} className="text-pink-500" />,
+                description: "O plano de saúde falha no cardiologista, mas o pânico real é dermatológico. O grupo se mobiliza para garantir o preenchimento labial com a Dra. Virgínia na clínica Nova Pelle. Prioridades."
+            },
+            {
+                month: "ABRIL",
+                title: "O Pódio da Ilusão & A Marcha à Ré",
+                icon: <Trophy size={24} className="text-yellow-400" />,
+                description: "Tiago e Julia ganham troféu de 4º lugar no Beach Tennis. Gui Pinho diz que foi de 3 duplas. Drielle corrige: \"4º... de 20 duplas, muito amargo\". Luiza ironiza: \"O próximo é ouro\". Gustavo questiona a existência do troféu. Paralelamente, Ricardo anuncia que seu filho Levi engatinha de ré e bloqueia visitas: \"Espera eu tomar as vacinas tia\"."
+            },
+            {
+                month: "JUNHO/JULHO",
+                title: "O Aniversário Ctrl+C Ctrl+V & O Exílio",
+                icon: <MapPin size={24} className="text-blue-500" />,
+                description: "O aniversário de Gui Pinho é esquecido até Michaela lembrar. Rafa, Drielle, Indinho e Tiago copiam a mesma mensagem (zoando que a namorada Taisa é mais legal). Ricardo manda de cabeça para baixo. Em Julho, após boatos de Guarapari, Daviline é exilada para Formosa, assumindo a persona de \"Prefeita de Hilux\"."
+            },
+            {
+                month: "AGOSTO",
+                title: "Guerra Cultural: Raiz vs. Nutella",
+                icon: <Users size={24} className="text-purple-500" />,
+                description: "Rafa celebra aniversário na comunidade (\"raiz\", confusão, gritaria). A facção de Brasília (Gustavo, Tiago) fica no bar Oscarito no SIG. Gustavo sentencia: \"Comunidade Nutella\"."
+            },
+            {
+                month: "SETEMBRO-NOVEMBRO",
+                title: "A Decepção do Nota Legal & A Ameaça Jorginho",
+                icon: <Banknote size={24} className="text-green-500" />,
+                description: "Sorteio do Nota Legal: Luiza ganha R$ 100 (\"Uhul\"). Rafa e Drielle reclamam da miséria. Surge a ameaça \"Jorginho\", o chato da festa da firma. Rafa cria o código de resgate: \"me puxem pelo braço\". Tiago relembra o trauma do Halloween: \"ficou 1 hora falando\"."
+            },
+            {
+                month: "DEZEMBRO",
+                title: "A Revolta dos R$ 98 & O Bolão da Esperança",
+                icon: <UtensilsCrossed size={24} className="text-red-400" />,
+                description: "Daviline sugere jantar de Natal por R$ 98 no \"Flor do Cerrado\". Juliano chama de \"preço de casamento\", Tobias acha pouco. O grupo decide por comida pronta barata. No Bolão da Mega (R$ 14,00), Rafa ameaça Pedro de exclusão. Sonhos: Casamento nas Maldivas (Rafa) e 350 Kwids (Ricardo).",
+                widgets: ['dinner', 'bolao']
+            }
+        ];
 
-        // 2. Character Card Component
-        const CharacterCard = ({ char }) => (
-            <div className="glass-panel p-6 rounded-xl transform hover:-translate-y-2 transition-all duration-300 relative group">
-                <div className="absolute -top-4 -right-4 bg-yellow-500 text-black font-bold px-3 py-1 rounded-full text-sm shadow-md">
-                    {char.archetype}
-                </div>
-                <div className="text-4xl mb-4">{char.icon}</div>
-                <h3 className="text-2xl font-bold text-white mb-2">{char.name}</h3>
-                <p className="text-slate-300 text-sm mb-4 italic">"{char.quote}"</p>
-                <div className="border-t border-slate-600 pt-4">
-                    <h4 className="text-xs uppercase tracking-wider text-slate-500 font-bold mb-2">Momentos Chave</h4>
-                    <p className="text-sm text-slate-200">{char.desc}</p>
-                </div>
-            </div>
-        );
-
-        // 3. Interactive Widgets
+        // --- WIDGETS ---
         const ReginaldoSimulator = () => {
-            const [msg, setMsg] = useState("Clique para invocar Reginaldo");
+            const [message, setMessage] = useState("Clique para receber a sabedoria de Reginaldo");
             const messages = [
-                "Cotação do Dólar: R$ 5,89 (Fonte: Vozes da minha cabeça)",
-                "Vocês já leram Dostoiévski hoje?",
-                "Kkkkkkkkk",
-                "Alguém viu minha chave?",
-                "Nada com nada.",
-                "[Link suspeito do YouTube]",
-                "Bom dia grupo (às 15:00)"
+                "Cotação do Dólar: R$ 5,91 (Fonte: Vozes)",
+                "Vocês já leram a bula do Dorflex hoje?",
+                "Nada com nada kkkk",
+                "Alguém tem o contato de um vidraceiro confiável?",
+                "Bom dia grupo (às 19:45)",
+                "[Link para um vídeo de 3h sobre física quântica]",
+                "..."
             ];
-            
-            const generate = () => {
-                const random = messages[Math.floor(Math.random() * messages.length)];
-                setMsg(random);
-            };
-
+            const generate = () => setMessage(messages[Math.floor(Math.random() * messages.length)]);
             return (
-                <div className="bg-slate-800 p-4 rounded-lg border border-slate-600 my-4 text-center">
-                    <h4 className="font-bold text-blue-400 mb-2">📟 Simulador de Reginaldo</h4>
-                    <div className="bg-slate-900 p-3 rounded mb-3 font-mono text-green-400 min-h-[60px] flex items-center justify-center">
-                        "{msg}"
+                <div className="mt-4 p-4 bg-gray-800/50 rounded-lg border border-purple-500/30 text-center">
+                    <h4 className="font-bold text-purple-400 mb-2 flex justify-center items-center gap-2"><lucide.BrainCircuit size={18}/> Simulador de Reginaldo</h4>
+                    <div className="bg-gray-900 p-3 rounded-lg font-mono text-green-400 text-sm min-h-[50px] flex items-center justify-center border border-green-900/50">
+                        "{message}"
                     </div>
-                    <div className="text-xs text-slate-500 mb-2 italic">Julia está se divertindo com isso...</div>
-                    <button onClick={generate} className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm text-white">
+                    <p className="text-xs text-gray-500 mt-2 italic">Julia está se divertindo com isso...</p>
+                    <button onClick={generate} className="mt-3 bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2 px-4 rounded-full transition-colors">
                         Gerar Mensagem Aleatória
                     </button>
                 </div>
@@ -157,273 +190,211 @@
         };
 
         const SefazSurvival = () => {
-            const [status, setStatus] = useState("alive"); // alive, dead, escaped
-
+            const [status, setStatus] = useState("neutral");
             return (
-                <div className="bg-red-900/30 p-4 rounded-lg border border-red-500/50 my-4">
-                    <h4 className="font-bold text-red-400 mb-2 flex items-center gap-2">
-                        <Construction size={16}/> Alerta Estrutural SEFAZ
-                    </h4>
-                    <p className="text-sm mb-4">Juliano gritou: "Vão esperar alguém morrer?" O que você faz?</p>
-                    
-                    {status === "alive" && (
-                        <div className="flex gap-2 justify-center">
-                            <button onClick={() => setStatus("dead")} className="bg-red-600 px-3 py-1 rounded text-sm">Esperar o Laudo</button>
-                            <button onClick={() => setStatus("escaped")} className="bg-green-600 px-3 py-1 rounded text-sm">Pular na Laje (Tiago Style)</button>
+                <div className="mt-4 p-4 bg-red-900/20 rounded-lg border border-red-500/30 text-center">
+                    <h4 className="font-bold text-red-400 mb-2 flex justify-center items-center gap-2"><AlertTriangle size={18}/> Alerta Estrutural SEFAZ (10º Andar)</h4>
+                    <p className="text-sm mb-4">Juliano gritou. O teto estalou. Qual sua ação imediata?</p>
+                    {status === "neutral" && (
+                        <div className="flex justify-center gap-2">
+                            <button onClick={() => setStatus("burocracia")} className="bg-gray-600 hover:bg-gray-700 text-white text-xs font-bold py-2 px-3 rounded">Esperar "Laudo"</button>
+                            <button onClick={() => setStatus("tiago")} className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-3 rounded">Pular na Laje (Método Tiago)</button>
                         </div>
                     )}
-                    
-                    {status === "dead" && (
-                        <div className="text-center mt-2 animate-pulse text-red-300">
-                            💀 Você confiou na burocracia. O teto caiu. Fim.
-                        </div>
-                    )}
-                    
-                    {status === "escaped" && (
-                        <div className="text-center mt-2 text-green-300">
-                            🏃‍♂️ Você pulou pro 3º andar! Sobreviveu para reclamar do ar-condicionado amanhã.
-                        </div>
-                    )}
-                </div>
-            );
-        };
-
-        const GuiPinhoBirthday = () => {
-            const [copied, setCopied] = useState(false);
-            const [upsideDown, setUpsideDown] = useState(false);
-
-            return (
-                <div className="bg-slate-700 p-4 rounded-lg my-4">
-                    <h4 className="font-bold text-purple-400 mb-2">🎂 Aniversário do Gui Pinho</h4>
-                    <p className="text-xs mb-2">Esqueceram o aniversário. Michaela lembrou tarde. O que você faz?</p>
-                    
-                    {!copied ? (
-                        <div className="flex gap-2 justify-center">
-                            <button onClick={() => setCopied(true)} className="bg-purple-600 px-3 py-1 rounded text-sm">Copiar msg da Michaela</button>
-                            <button onClick={() => {setCopied(true); setUpsideDown(true)}} className="bg-yellow-600 px-3 py-1 rounded text-sm">Mandar de Cabeça pra Baixo (Ricardo)</button>
-                        </div>
-                    ) : (
-                        <div className={`bg-white text-black p-2 rounded mt-2 text-center text-sm ${upsideDown ? 'rotate-180' : ''}`}>
-                            "Parabeeeens atrasado... (Taisa é mais gente boa que vc)"
-                        </div>
-                    )}
+                    {status === "burocracia" && <p className="text-red-300 font-bold animate-pulse">💀 Você confiou no RH. O laudo chegou póstumo. Fim.</p>}
+                    {status === "tiago" && <p className="text-blue-300 font-bold">🏃‍♂️ Você pulou pro 3º andar! Sobreviveu para tomar café no Oscarito.</p>}
                 </div>
             );
         };
 
         const DinnerCalculator = () => {
-            const [revolt, setRevolt] = useState(50);
-            
+            const [price, setPrice] = useState(98);
+            let reaction = "";
+            if (price < 50) reaction = "Tobias: \"Menos que isso difícil, vou passar fome.\"";
+            else if (price < 90) reaction = "Grupo: \"Aceitável, mas traga sua própria bebida.\"";
+            else if (price < 150) reaction = "Juliano: \"Preço de casamento isso! Sou comunista agora.\"";
+            else reaction = "Daviline: \"Normal pra quem ganha o teto. Paguem.\"";
+
             return (
-                <div className="bg-green-900/30 p-4 rounded-lg border border-green-500/50 my-4">
-                    <h4 className="font-bold text-green-400 mb-2 flex items-center gap-2">
-                        <Utensils size={16}/> Natal na Daviline
-                    </h4>
-                    <p className="text-xs mb-3">Preço sugerido do jantar: R$ {98 + (revolt/2)}</p>
-                    <input 
-                        type="range" 
-                        min="0" 
-                        max="100" 
-                        value={revolt} 
-                        onChange={(e) => setRevolt(e.target.value)}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    />
-                    <div className="mt-2 text-center font-bold text-yellow-300">
-                        Nível de Revolta: {revolt > 80 ? "COMUNISTA (Juliano)" : revolt > 50 ? "MÃO DE VACA (Tobias)" : "ELITE (Daviline)"}
-                    </div>
-                    <div className="text-xs text-center mt-1 italic">
-                        {revolt > 80 ? '"Preço de casamento isso!"' : revolt > 50 ? '"Menos que isso é difícil..."' : '"Vou levar Hilux e Fivela"'}
+                <div className="mt-4 p-4 bg-green-900/20 rounded-lg border border-green-500/30">
+                    <h4 className="font-bold text-green-400 mb-2 flex justify-center items-center gap-2"><UtensilsCrossed size={18}/> Calculadora de Revolta do Natal</h4>
+                    <label className="block text-sm font-bold mb-2 text-center">Preço do Jantar no "Flor do Cerrado": R$ {price},00</label>
+                    <input type="range" min="30" max="200" value={price} onChange={(e) => setPrice(parseInt(e.target.value))} className="w-full accent-green-500" />
+                    <div className="mt-3 p-2 bg-gray-900/50 rounded text-center text-sm font-mono text-yellow-300 border border-yellow-600/30">
+                        {reaction}
                     </div>
                 </div>
             );
         };
 
-        // 4. Timeline Section
-        const Timeline = () => {
-            const events = [
-                {
-                    month: "JANEIRO",
-                    title: "O Enigma & O Colapso",
-                    content: "O ano começa com Reginaldo falando nada com nada e o prédio da SEFAZ ameaçando ruir. A elite fiscal trabalha sob risco de morte.",
-                    widget: <><ReginaldoSimulator /><SefazSurvival /></>
-                },
-                {
-                    month: "FEVEREIRO",
-                    title: "Carnaval & Unhas",
-                    content: "Dilema: Bloco Raparigueiros (Facada) ou Segurança? Tiago quebra a unha no futevôlei e enterra o sonho do Ironman.",
-                    icon: <Skull className="text-red-500" />
-                },
-                {
-                    month: "MARÇO",
-                    title: "Crise do Botox",
-                    content: "Assefaz suspensa. Pânico geral. Ninguém liga pro coração, a prioridade é a Dra. Virgínia e o preenchimento labial.",
-                    icon: <Syringe className="text-pink-500" />
-                },
-                {
-                    month: "ABRIL",
-                    title: "O Pódio de Schrödinger",
-                    content: "Tiago e Julia ganham troféu de 4º lugar (entre 3 duplas?). Gustavo questiona a existência: 'Pq ganha troféu?'. Drielle audita: 'Muito amargo'.",
-                    customVisual: (
-                        <div className="flex items-center justify-center p-4 bg-yellow-900/20 rounded-lg border border-yellow-600 border-dashed">
-                            <Trophy className="text-yellow-600 mr-2" size={40} />
-                            <div className="text-center">
-                                <h3 className="text-xl font-bold text-yellow-500">4º LUGAR</h3>
-                                <p className="text-xs text-yellow-700">Mérito duvidoso</p>
-                            </div>
-                        </div>
-                    )
-                },
-                {
-                    month: "MAIO",
-                    title: "A Marcha à Ré de Levi",
-                    content: "Filho de Ricardo aprende a engatinhar... para trás. Ricardo exige vacinas antes de visitas. O grupo derrete em emojis.",
-                    customVisual: (
-                        <div className="flex justify-center my-4">
-                            <Baby className="animate-crawl text-blue-300" size={48} />
-                        </div>
-                    )
-                },
-                {
-                    month: "JUNHO/JULHO",
-                    title: "Esquecimento & Exílio",
-                    content: "Aniversário de Gui Pinho esquecido (Ctrl+C Ctrl+V). Daviline exilada em Formosa (Fanfic: Prefeita Corrupta de Hilux).",
-                    widget: <GuiPinhoBirthday />
-                },
-                {
-                    month: "AGOSTO",
-                    title: "Luta de Classes",
-                    content: "Rafa faz festa na comunidade ('Raiz', maconha e confusão). O resto vai pro Oscarito ('Nutella'). Gustavo sentencia: 'Comunidade Nutella'.",
-                    icon: <Users className="text-orange-500" />
-                },
-                {
-                    month: "DEZEMBRO",
-                    title: "Miséria de Luxo",
-                    content: "Nota Legal: Luiza ganha R$ 100, o resto chora. Jantar de R$ 98 causa revolta proletária. Bolão da Mega: R$ 14,00 por cabeça.",
-                    widget: <DinnerCalculator />
-                }
-            ];
+        const BolaoSimulator = () => {
+            const [result, setResult] = useState(null);
+            const play = () => {
+                const outcome = Math.random();
+                if (outcome < 0.01) setResult("WIN_LUISA");
+                else if (outcome < 0.05) setResult("WIN_RAFA");
+                else if (outcome < 0.1) setResult("WIN_RICARDO");
+                else setResult("LOSE");
+            };
 
             return (
-                <div className="max-w-3xl mx-auto px-4 py-10 relative">
-                    <div className="absolute left-4 md:left-1/2 h-full w-1 bg-slate-700 transform -translate-x-1/2"></div>
-                    
-                    {events.map((event, idx) => (
-                        <div key={idx} className={`relative mb-12 flex flex-col md:flex-row ${idx % 2 === 0 ? 'md:flex-row-reverse' : ''} items-center w-full`}>
-                            {/* Dot on timeline */}
-                            <div className="absolute left-4 md:left-1/2 w-4 h-4 bg-yellow-400 rounded-full transform -translate-x-1/2 border-4 border-slate-900 z-10"></div>
-                            
-                            {/* Content Bubble */}
-                            <div className="w-full md:w-5/12 ml-12 md:ml-0 glass-panel p-5 rounded-lg border-l-4 border-l-yellow-500">
-                                <span className="text-xs font-bold text-yellow-400 tracking-widest">{event.month}</span>
-                                <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-                                    {event.icon} {event.title}
-                                </h3>
-                                <p className="text-slate-300 text-sm leading-relaxed mb-3">
-                                    {event.content}
-                                </p>
-                                {event.customVisual}
-                                {event.widget}
-                            </div>
-                        </div>
-                    ))}
+                <div className="mt-4 p-4 bg-yellow-900/20 rounded-lg border border-yellow-500/30 text-center">
+                    <h4 className="font-bold text-yellow-400 mb-2 flex justify-center items-center gap-2"><DollarSign size={18}/> Bolão da Mega (R$ 14,00)</h4>
+                    <p className="text-sm mb-4">A chance de mudar de vida (ou ganhar R$ 100).</p>
+                    {!result && <button onClick={play} className="bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-bold py-2 px-6 rounded-full transition-colors animate-pulse">Apostar R$ 14tão</button>}
+                    {result === "WIN_LUISA" && <p className="text-green-400 font-bold">🎉 Luiza acertou a quadra! Ganhou R$ 100,00! Uhul!</p>}
+                    {result === "WIN_RAFA" && <p className="text-blue-400 font-bold">✈️ Rafa ganhou a quina! Maldivas, aí vou eu!</p>}
+                    {result === "WIN_RICARDO" && <p className="text-purple-400 font-bold">🚗 Ricardo ganhou o prêmio principal! 350 Kwids encomendados!</p>}
+                    {result === "LOSE" && <p className="text-red-400 font-bold">💸 Vocês perderam R$ 14,00. Voltando para a SEFAZ amanhã.</p>}
                 </div>
             );
         };
 
-        // 5. Roster Section
-        const Roster = () => {
-            const characters = [
-                { name: "Tiago", archetype: "O Líder Frágil", icon: "💅", quote: "Se der merda... tamo no terceiro andar... da até pra pular", desc: "Quebrou unha no futevôlei. 4º lugar no Beach Tennis. Sofre bullying da esposa." },
-                { name: "Rafa", archetype: "Agitador Raiz", icon: "🍺", quote: "Para de jogar água no meu chopp", desc: "Organiza eventos caóticos. Alerta sobre facadas. Odeia Jorginho." },
-                { name: "Juliano", archetype: "Rebelde Marxista", icon: "☭", quote: "Vão esperar alguém morrer?", desc: "Furioso com a SEFAZ. Cético com preços de Natal. Prioriza Botox." },
-                { name: "Daviline", archetype: "Matriarca Exilada", icon: "🤠", quote: "Preço de casamento isso", desc: "Exilada em Formosa. Agroboy de Hilux. Tenta cobrar R$ 98 no jantar." },
-                { name: "Tobias", archetype: "Agente do Caos", icon: "🌪️", quote: "Menos que isso difícil", desc: "Sugere blocos perigosos. Maior perigo é ele para ele mesmo." },
-                { name: "Ricardo", archetype: "Pai Porteiro", icon: "👶", quote: "Espera eu tomar as vacinas tia", desc: "Usa Levi como escudo. Manda msg de cabeça pra baixo. Quer Kwids." },
-                { name: "Gui Pinho", archetype: "Gerente Esquecido", icon: "📉", quote: "Errada eh vc que ainda lê", desc: "Aniversário esquecido. Pragmático. Zoa o Reginaldo." },
-                { name: "Drielle", archetype: "Auditora da Verdade", icon: "👄", quote: "4º gente... Muito amargo", desc: "Turista estética. Obcecada por preenchimento. Expõe fracassos alheios." },
-                { name: "Reginaldo", archetype: "O Enigma", icon: "👽", quote: "Nada com nada kkkk", desc: "Cota dólar aleatoriamente. Entretenimento da Julia." },
-                { name: "Julia", archetype: "Observadora", icon: "👀", quote: "Só no suco 🤣🤣", desc: "Parceira de pódio duvidoso. Ri do Reginaldo." },
-            ];
-
-            return (
-                <div className="max-w-6xl mx-auto px-4 py-12">
-                    <h2 className="text-4xl font-marker text-center text-white mb-10">O Elenco do Caos <span className="text-sm font-sans block text-slate-400 mt-2">Arquétipos de 2025</span></h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {characters.map((char, idx) => (
-                            <CharacterCard key={idx} char={char} />
-                        ))}
-                    </div>
-                </div>
-            );
-        };
-
-        // 6. Conclusion
-        const Conclusion = () => (
-            <div className="bg-slate-900 py-16 px-6 text-center mt-12 border-t border-slate-800">
-                <div className="max-w-3xl mx-auto">
-                    <h2 className="text-3xl font-bold text-white mb-6">Conclusão Sociológica</h2>
-                    <p className="text-lg text-slate-300 mb-8 italic">
-                        "Vínculo Traumático via Zueira"
+        // --- MAIN COMPONENTS ---
+        const Hero = ({ onStart }) => (
+            <div className="min-h-screen flex flex-col justify-center items-center text-center p-6 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] bg-fixed relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-gray-900 z-0"></div>
+                <div className="z-10 flex flex-col items-center">
+                    <h1 className="font-marker text-5xl md:text-7xl text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 mb-4 animate-float filter drop-shadow-[0_0_10px_rgba(236,72,153,0.5)]">
+                        CASAMENTO FISCAL
+                    </h1>
+                    <h2 className="font-mono text-2xl md:text-3xl text-blue-300 mb-6">
+                        Crônicas do Caos: Retrospectiva 2025
+                    </h2>
+                    <p className="max-w-2xl text-lg text-gray-300 mb-10 leading-relaxed">
+                        Um mergulho sociológico no bunker digital onde a elite do funcionalismo público debate a ruína da SEFAZ, a crise do botox e a luta por R$ 14,00. Do "preço de casamento" da Daviline à "unha do Tiago".
                     </p>
-                    <div className="bg-slate-800 p-6 rounded-xl text-left space-y-4">
-                        <p>🏆 <strong>Precariedade de Luxo:</strong> Sala VIP de aeroporto vs. Prédio caindo aos pedaços.</p>
-                        <p>💸 <strong>Ansiedade Econômica:</strong> Salário de Auditor vs. Briga por R$ 14,00 no bolão.</p>
-                        <p>🎾 <strong>Cultura da Resenha:</strong> O objetivo não é vencer o Beach Tennis, é transformar o 4º lugar em meme.</p>
-                    </div>
-                    <p className="mt-10 text-slate-500 text-sm">
-                        Desenvolvido para o Grupo Casamento Fiscal. <br/>
-                        Sobrevivemos a 2025. Que venham os Kwids de Ricardo em 2026.
-                    </p>
+                    <button onClick={onStart} className="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-gray-900 font-mono rounded-full hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 border-2 border-yellow-500 hover:border-pink-500 shadow-[0_0_15px_rgba(234,179,8,0.5)] hover:shadow-[0_0_20px_rgba(236,72,153,0.7)]">
+                        <span className="mr-2">INICIAR ZUEIRA</span> <PartyPopper className="group-hover:rotate-12 transition-transform"/>
+                    </button>
                 </div>
             </div>
         );
 
-        // Main App Component
-        const App = () => {
-            const [view, setView] = useState('hero'); // hero, app
+        const TimelineEvent = ({ event, index }) => {
+            const isEven = index % 2 === 0;
+            return (
+                <div className={`relative flex flex-col md:flex-row ${isEven ? 'md:flex-row-reverse' : ''} items-center mb-16 w-full max-w-4xl mx-auto group`}>
+                    {/* Timeline Node */}
+                    <div className="absolute left-4 md:left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gray-900 border-4 border-blue-500 rounded-full z-10 group-hover:border-pink-500 transition-colors shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
+                    
+                    {/* Content Card */}
+                    <div className={`w-full md:w-[calc(50%-2rem)] glass-panel p-6 rounded-xl ml-12 md:ml-0 ${isEven ? 'md:mr-auto md:text-right' : 'md:ml-auto md:text-left'} hover:scale-[1.02] transition-transform duration-300 border-l-4 ${isEven ? 'border-r-4 border-l-0 md:border-l-0 md:border-r-4' : ''} border-blue-500 group-hover:border-pink-500`}>
+                        <span className="font-mono text-sm font-bold text-blue-400 block mb-2 tracking-wider">{event.month}</span>
+                        <h3 className={`text-2xl font-bold text-white mb-3 flex items-center gap-3 ${isEven ? 'md:flex-row-reverse' : ''}`}>
+                            {event.icon}
+                            <span>{event.title}</span>
+                        </h3>
+                        <p className="text-gray-300 leading-relaxed mb-4">{event.description}</p>
+                        {event.widgets && event.widgets.includes('reginaldo') && <ReginaldoSimulator />}
+                        {event.widgets && event.widgets.includes('sefaz') && <SefazSurvival />}
+                        {event.widgets && event.widgets.includes('dinner') && <DinnerCalculator />}
+                        {event.widgets && event.widgets.includes('bolao') && <BolaoSimulator />}
+                    </div>
+                </div>
+            );
+        };
 
-            if (view === 'hero') {
-                return <Hero onStart={() => setView('app')} />;
-            }
+        const CharacterCard = ({ char }) => (
+            <div className="glass-panel p-6 rounded-xl relative group overflow-hidden hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] transition-all duration-300">
+                <div className="absolute top-0 right-0 bg-gradient-to-l from-purple-600 to-blue-600 text-xs font-bold px-3 py-1 rounded-bl-lg shadow-md">
+                    {char.archetype}
+                </div>
+                <div className="text-5xl mb-4 filter drop-shadow-lg group-hover:scale-110 transition-transform">{char.icon}</div>
+                <h3 className="text-2xl font-bold text-white mb-2">{char.name}</h3>
+                <div className="mb-4 relative">
+                    <div className="whatsapp-message text-sm italic">
+                        "{char.quote}"
+                    </div>
+                </div>
+                <p className="text-gray-400 text-sm border-t border-gray-700 pt-4">
+                    {char.desc}
+                </p>
+            </div>
+        );
+
+        const App = () => {
+            const [view, setView] = useState('hero');
+
+            if (view === 'hero') return <Hero onStart={() => setView('timeline')} />;
 
             return (
-                <div className="min-h-screen">
-                    {/* Navigation */}
-                    <nav className="sticky top-0 z-50 bg-slate-900/90 backdrop-blur border-b border-slate-700 px-6 py-4 flex justify-between items-center">
-                        <div className="font-marker text-yellow-400 text-xl">CF 2025</div>
-                        <div className="text-xs text-slate-400 hidden md:block">Bunker dos Auditores</div>
+                <div className="min-h-screen bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] bg-fixed">
+                    {/* Navbar */}
+                    <nav className="sticky top-0 z-50 bg-gray-900/90 backdrop-blur-md border-b border-gray-800 px-4 py-3 flex justify-between items-center shadow-lg">
+                        <div className="font-marker text-2xl text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-500">CF 2025</div>
+                        <div className="font-mono text-xs md:text-sm text-gray-400 flex items-center gap-2">
+                            <lucide.Building size={14}/> Bunker dos Auditores
+                        </div>
                     </nav>
 
-                    {/* Content */}
-                    <Timeline />
-                    
-                    {/* Intermission: Escape Jorginho Game */}
-                    <div className="bg-purple-900 py-10 text-center">
-                        <h3 className="text-2xl font-bold text-white mb-2">🚨 ALERTA: JORGINHO APROXIMANDO 🚨</h3>
-                        <p className="text-purple-200 mb-4">"Ele pegou eu e a Julia no Halloween... 1 hora falando..."</p>
-                        <button 
-                            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded animate-pulse"
-                            onClick={() => alert("Rafa puxou seu braço! Você foi salvo.")}
-                        >
-                            SINAL DE RESGATE DO RAFA
-                        </button>
-                    </div>
+                    <main className="pb-20">
+                        {/* Timeline Section */}
+                        <section className="py-16 px-4 relative">
+                            <h2 className="text-4xl font-marker text-center text-white mb-16 drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">Linha do Tempo do Caos</h2>
+                            <div className="timeline-line"></div>
+                            {events.map((event, index) => (
+                                <TimelineEvent key={index} event={event} index={index} />
+                            ))}
+                        </section>
 
-                    <Roster />
+                        {/* Intermission: Jorginho Alert */}
+                        <section className="py-12 bg-gradient-to-r from-purple-900 to-indigo-900 text-center relative overflow-hidden border-y border-purple-500/50">
+                            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/diagmonds.png')] opacity-20"></div>
+                            <div className="relative z-10 px-4">
+                                <h3 className="text-3xl font-bold text-white mb-4 flex justify-center items-center gap-3 animate-pulse">
+                                    <Siren size={32} className="text-red-500"/> ALERTA: JORGINHO APROXIMANDO!
+                                </h3>
+                                <p className="text-purple-200 mb-6 max-w-xl mx-auto">"Ele pegou eu e a Julia no Halloween... 1 hora falando... Impossível se livrar." - Tiago</p>
+                                <button onClick={() => alert("Protocolo de Segurança Ativado: Rafa puxou seu braço. Você foi salvo da conversa chata.")} className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-red-500/50 transition-all animate-bounce flex items-center gap-2 mx-auto">
+                                    <lucide.ShieldAlert size={20}/> ATIVAR RESGATE DO RAFA
+                                </button>
+                            </div>
+                        </section>
 
-                    <Conclusion />
+                        {/* Roster Section */}
+                        <section className="py-16 px-4 max-w-7xl mx-auto">
+                            <h2 className="text-4xl font-marker text-center text-white mb-6">O Elenco do Caos</h2>
+                            <p className="text-center text-gray-400 mb-12 max-w-2xl mx-auto font-mono">Arquétipos forjados no fogo da burocracia e do assado semanal, baseados em 15.000 palavras de puro suco de zueira.</p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {characters.map((char, idx) => (
+                                    <CharacterCard key={idx} char={char} />
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* Conclusion Footer */}
+                        <footer className="bg-gray-900/80 py-12 px-4 text-center border-t border-gray-800 relative overflow-hidden">
+                            <div className="max-w-3xl mx-auto relative z-10">
+                                <HeartHandshake size={48} className="text-pink-500 mx-auto mb-4" />
+                                <h2 className="text-3xl font-bold text-white mb-4">Conclusão: Vínculo Traumático via Zueira</h2>
+                                <p className="text-lg text-gray-300 italic mb-8">"Uma família unida pelo medo de o prédio cair e pela vontade de zoar o pódio alheio."</p>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm font-mono text-left bg-black/30 p-6 rounded-xl border border-gray-700">
+                                    <div className="p-3"><strong className="text-blue-400 block mb-1">Precariedade de Luxo:</strong> Discutem Sala VIP enquanto o teto da SEFAZ estala.</div>
+                                    <div className="p-3 border-t md:border-t-0 md:border-l border-gray-700"><strong className="text-green-400 block mb-1">Ansiedade Performática:</strong> Elite salarial que briga por bolão de R$ 14 e jantares de R$ 98.</div>
+                                    <div className="p-3 border-t md:border-t-0 md:border-l border-gray-700"><strong className="text-yellow-400 block mb-1">Cultura da Resenha:</strong> O objetivo não é vencer, é transformar a derrota (4º lugar) em meme eterno.</div>
+                                </div>
+                                <p className="mt-10 text-gray-500 text-xs font-mono">
+                                    © 2025 Casamento Fiscal Corp. | Desenvolvido no Bunker. | Sobrevivemos a 2025. Vem 2026 e os Kwids do Ricardo.
+                                </p>
+                            </div>
+                        </footer>
+                    </main>
                     
-                    {/* Floating Music Button (Simulated) */}
+                    {/* Floating Daviline Button */}
                     <div className="fixed bottom-6 right-6 z-50">
-                        <button className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110" onClick={() => alert("Tocando áudio: 'Normal' - Daviline")}>
-                           <Mic size={24} />
+                        <button onClick={() => alert("Tocando áudio de 12min de Daviline: \"Gente, sobre Formosa... a Hilux tá na revisão... e o jantar de R$ 98 é um absurdo...\"")} className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white p-4 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.5)] hover:shadow-[0_0_25px_rgba(16,185,129,0.7)] transition-all hover:scale-110 flex items-center justify-center group">
+                            <lucide.Mic size={24} className="group-hover:animate-ping absolute opacity-50"/>
+                            <lucide.Mic size={24} className="relative z-10"/>
                         </button>
                     </div>
                 </div>
             );
         };
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
+        // React 18 Root API fix
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
         root.render(<App />);
     </script>
 </body>
